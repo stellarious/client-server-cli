@@ -10,7 +10,22 @@ clear()
 fieldnames = ('ID', 'Model', 'Sys. Cache', 'Max control.', 
 	'Protocols.', 'Ports', 'Max disks', 'Price')
 
+dbfilename = 'db.dat'
+
 db = []
+
+def check_db():
+	if os.path.isfile(dbfilename):
+		with open(dbfilename, 'rb') as f:
+			data = f.read()
+			db = pickle.loads(data)
+		print('File was loaded.')
+
+def save_db():
+	with open(dbfilename, 'wb') as f:
+		data = pickle.dumps(db)
+		f.write(data)
+	print('Data saved.')
 
 #-------------------------------------------------------------
 def header(func):
@@ -125,6 +140,8 @@ def main():
 		
 		print('Connected with {}:{}'.format(addr[0], addr[1]))
 
+		check_db()
+
 		while True:
 			data = conn.recv(4096)
 			if not data: break
@@ -134,6 +151,8 @@ def main():
 
 		conn.close()
 		print('{}:{} disonnected '.format(addr[0], addr[1]))
+		save_db()
 
 if __name__ == '__main__':
 	main()
+	

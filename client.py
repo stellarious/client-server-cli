@@ -15,7 +15,6 @@ fieldnames = ('Model', 'System cache', 'Max controllers', 'Protocols',
 
 attrnames = 'Hint: id, model, system_cache, max_controllers, protocols, port_types, max_disks, price'
 
-
 def head(fn):
 	def wrapper(arg):
 		clear()
