@@ -2,12 +2,13 @@ import os
 import sys
 import socket
 import pickle
-from storage import StorageSystem, menu, clear
-from io import StringIO
+import operator
+from utils import StorageSystem, menu, clear
 
 clear()
 
-fieldnames = ('Model', 'Sys. Cache', 'Max control.', 'Protocols.', 'Ports', 'Max disks')
+fieldnames = ('ID', 'Model', 'Sys. Cache', 'Max control.', 
+	'Protocols.', 'Ports', 'Max disks', 'Price')
 
 db = []
 
@@ -19,32 +20,64 @@ def header(func):
 	return wrapped
  
 def add_record(args):
-	# проверить есть ли файл бд, открыть его и добавить в конец
 	new_record = StorageSystem(args)
 	db.append(new_record)
-	return 'OK'
+	return '<<< OK'
 
 def edit_record(args):
-	pass
+	if not db: return '<<< DB is empty'
 
-def delete_record(args):
-	return 'delete!@!!!!!!!!!'
+	obj_id = args[0]
+	field = args[1]
+	new_value = args[2]
 
+	for item in db:
+		if item.id == obj_id:
+			setattr(item, field, new_value)
+		else:
+			return '<<< No such record'
+
+
+def delete_record(obj_id):
+	if not db: return '<<< DB is empty' 
+
+	for item in db:
+		if item.id == obj_id:
+			db.remove(item)
+			return '<<< Record with id {} was deleted'.format(obj_id)
+		else:
+			return '<<< No such record'
+
+@header
 def search(args):
-	pass
+	if not db: return '<<< DB is empty'
+
+	field = args[0]
+	value = args[1]
+
+	field_vals = list(map(operator.attrgetter(field), db))
+	items_vals = list(zip(db, field_vals))
+	items = [str(x[0]) for x in items_vals if x[1] == value]
+
+	res = '\n'.join(items)
+	return res
 
 @header
 def show_all(args):
-	if db:
-		items = [str(x) for x in db]
-		res = '\n'.join(items)
-	else:
-		res = 'Nothing to show.'
+	if not db: return '<<< DB is empty' 
+	items = [str(x) for x in db]
+	res = '\n'.join(items)
 	return res
 
 @header
 def sort(args):
-	pass
+	if not db: return '<<< DB is empty' 
+
+	sorted_items = list(sorted(db, key=operator.attrgetter(args)))
+	items = [str(x) for x in sorted_items]
+	res = '\n'.join(items)
+
+	return res
 
 #-------------------------------------------------------------
 

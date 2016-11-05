@@ -1,7 +1,7 @@
 import sys
 import socket
 import pickle
-from storage import StorageSystem, menu, clear
+from utils import StorageSystem, menu, clear
 
 WIDTH = 80
 
@@ -10,7 +10,11 @@ PORT = 1488
 
 conn = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
-fieldnames = ('Model', 'System cache', 'Max controllers', 'Protocols', 'Port types', 'Max disks')
+fieldnames = ('Model', 'System cache', 'Max controllers', 'Protocols',
+	'Port types', 'Max disks', 'Price')
+
+attrnames = 'Hint: id, model, system_cache, max_controllers, protocols, port_types, max_disks, price'
+
 
 def head(fn):
 	def wrapper(arg):
@@ -26,8 +30,6 @@ def add_record(num):
 		tmp = input('%s: ' % field)
 		record_attr.append(tmp)
 	res = (num, record_attr)
-	print(res)
-
 	send(conn, res)
 
 	input('Press Enter to return in main menu...')
@@ -35,17 +37,31 @@ def add_record(num):
 
 @head
 def edit_record(num):
+	print(attrnames)
+	rec_id = input('Enter object ID: ')
+	field = input('Enter field name: ')
+	val = input('Enter new value: ')
+	res = (rec_id, field, val)
+	data = (num, res)
+	send(conn, data)
+
 	input('Press Enter to return in main menu...')
 
 @head
 def delete_record(num):
-	data = (num, 0)
+	rec_id = input('Enter object ID to delete: ')
+	data = (num, rec_id)
 	send(conn, data)
 
 	input('Press Enter to return in main menu...')
 
 @head
 def search(num):
+	print(attrnames)
+	field = input('Enter field name: ')
+	val = input('Enter value: ')
+	data = (num, (field, val))
+	send(conn, data)
 	input('Press Enter to return in main menu...')
 
 @head
@@ -56,6 +72,11 @@ def show_all(num):
 
 @head
 def sort(num):
+	print(attrnames)
+	param = input('Sort by: ')
+	data = (num, param)
+	send(conn, data)
+
 	input('Press Enter to return in main menu...')
 
 def show_menu():	
