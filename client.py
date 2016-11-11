@@ -1,9 +1,13 @@
+#! /opt/anaconda3/bin/python3
+
+import os
 import sys
 import socket
 import pickle
-from utils import StorageSystem, menu, clear
+import signal
+from utils import StorageSystem, menu, clear, getch
 
-WIDTH = 80
+WIDTH = int(os.popen('stty size', 'r').read().split()[1])
 
 HOST = '127.0.0.1'
 PORT = 1488
@@ -14,6 +18,11 @@ fieldnames = ('Model', 'System cache', 'Max controllers', 'Protocols',
 	'Port types', 'Max disks', 'Price')
 
 attrnames = 'Hint: id, model, system_cache, max_controllers, protocols, port_types, max_disks, price'
+
+
+def signal_handler(signal, frame):
+        print('\nYou pressed Ctrl+C!')
+        sys.exit(0)
 
 def head(fn):
 	def wrapper(arg):
@@ -101,16 +110,16 @@ def main():
 	except socket.error as msg:
 		print(msg)
 		print('Well, it looks like server is shut down.')
-		input('\nPress Enter for quit...')
+		input('Press Enter for quit...')
 		clear()
 		sys.exit()
 
 	while True:
 		clear()
 		show_menu()
-		answer = input('Enter: ')
+		answer = getch()
 		
-		if not answer or answer == 'q' : 
+		if answer == 'q' : 
 			clear()
 			sys.exit()
 		if answer in menu:
@@ -125,4 +134,5 @@ def main():
 			options[answer](answer)
 
 if __name__ == '__main__':
+	signal.signal(signal.SIGINT, signal_handler)
 	main()

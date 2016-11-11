@@ -1,5 +1,6 @@
 import os
 import itertools
+import tty, sys, termios
 
 class StorageSystem:
 	class_counter = itertools.count()
@@ -34,3 +35,15 @@ menu = {
 }
 
 clear = lambda: os.system('clear')
+
+def getch():
+	fd = sys.stdin.fileno()
+	oldSettings = termios.tcgetattr(fd)
+
+	try:
+		tty.setraw(fd)
+		answer = sys.stdin.read(1)
+	finally:
+		termios.tcsetattr(fd, termios.TCSADRAIN, oldSettings)
+
+	return answer

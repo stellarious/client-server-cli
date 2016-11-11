@@ -1,8 +1,11 @@
+#! /opt/anaconda3/bin/python3
+
 import os
 import sys
 import socket
 import pickle
 import operator
+import signal
 from utils import StorageSystem, menu, clear
 
 clear()
@@ -14,20 +17,41 @@ dbfilename = 'db.dat'
 
 db = []
 
-def check_db():
+def signal_handler(signal, frame):
+	save_db()
+	print('Bye!')
+	sys.exit(0)
+
+def open_db():
 	if os.path.isfile(dbfilename):
 		with open(dbfilename, 'rb') as f:
 			data = f.read()
 			db = pickle.loads(data)
-		print('File was loaded.')
+			print('File was loaded.')
+			return db
+	else:
+		return []
 
 def save_db():
 	with open(dbfilename, 'wb') as f:
 		data = pickle.dumps(db)
 		f.write(data)
-	print('Data saved.')
+		print('Data saved.')
 
 #-------------------------------------------------------------
+def check_data(args):
+	try:
+		str(args[0]) # model
+		int(args[1]) # cache
+		int(args[2]) # contollers
+		str(args[3]) # protocols
+		str(args[4]) # ports
+		int(args[5]) # disks
+		int(args[6]) # price
+	except:
+		return False
+	return True
+
 def header(func):
 	def wrapped(arg):
 		h = '\t'.join(fieldnames)
@@ -35,9 +59,12 @@ def header(func):
 	return wrapped
  
 def add_record(args):
-	new_record = StorageSystem(args)
-	db.append(new_record)
-	return '<<< OK'
+	if check_data(args):
+		new_record = StorageSystem(args)
+		db.append(new_record)
+		return '<<< OK'
+	else:
+		return '<<< Bad data'
 
 def edit_record(args):
 	if not db: return '<<< DB is empty'
@@ -135,12 +162,13 @@ def main():
 	sock.listen(5)
 	print ('Socket now listening on %s ...' % PORT)
 
+	global db
+	db = open_db()
+
 	while True:
 		conn, addr = sock.accept()
 		
-		print('Connected with {}:{}'.format(addr[0], addr[1]))
-
-		check_db()
+		print('Connected with {}:{}'.format(addr[0], addr[1]))		
 
 		while True:
 			data = conn.recv(4096)
@@ -151,8 +179,8 @@ def main():
 
 		conn.close()
 		print('{}:{} disonnected '.format(addr[0], addr[1]))
-		save_db()
 
 if __name__ == '__main__':
+	signal.signal(signal.SIGINT, signal_handler)
 	main()
 	
