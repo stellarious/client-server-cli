@@ -10,8 +10,8 @@ from utils import StorageSystem, menu, clear
 
 clear()
 
-fieldnames = ('ID', 'Model', 'Sys. Cache', 'Max control.', 
-	'Protocols.', 'Ports', 'Max disks', 'Price')
+fieldnames = ('ID', '\tModel', '\tSys. Cache', 'Max control.', 
+	'Protocols.', 'Ports', '\tMax disks', 'Price')
 
 dbfilename = 'db.dat'
 
@@ -94,8 +94,7 @@ def delete_record(obj_id):
 def search(args):
 	if not db: return '<<< DB is empty'
 
-	field = args[0]
-	value = args[1]
+	field, value = args
 
 	field_vals = list(map(operator.attrgetter(field), db))
 	items_vals = list(zip(db, field_vals))
@@ -112,13 +111,11 @@ def show_all(args):
 	return res
 
 @header
-def sort(args):
+def sort(arg):
 	if not db: return '<<< DB is empty' 
-
-	sorted_items = list(sorted(db, key=operator.attrgetter(args)))
+	sorted_items = list(sorted(db, key=operator.attrgetter(arg)))
 	items = [str(x) for x in sorted_items]
 	res = '\n'.join(items)
-
 	return res
 
 #-------------------------------------------------------------
