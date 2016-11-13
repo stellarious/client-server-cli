@@ -11,7 +11,7 @@ from utils import StorageSystem, menu, clear
 clear()
 
 fieldnames = ('ID', '\tModel', '\tSys. Cache', 'Max control.', 
-	'Protocols.', 'Ports', '\tMax disks', 'Price')
+	'Protocols.', '\tPorts', '\tMax disks', 'Price')
 
 dbfilename = 'db.dat'
 
