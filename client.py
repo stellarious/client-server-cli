@@ -52,9 +52,28 @@ def add_record(num):
 @head
 def edit_record(num):
 	print(attrnames)
+
 	rec_id = input('Enter object ID: ')
+	try:
+		int(rec_id)
+	except:
+		return
+	
 	field = input('Enter field name: ')
+	if not field: 
+		print('No data.')
+		input()
+		return
+	if field == 'id':
+		print('Cannot edit ID.')
+		input()
+		return
 	val = input('Enter new value: ')
+	if not val: 
+		print('No data.')
+		input()
+		return
+	
 	res = (rec_id, field, val)
 	data = (num, res)
 	send(conn, data)

@@ -79,6 +79,11 @@ def edit_record(args):
 	field = args[1]
 	new_value = args[2]
 
+	try:
+		new_value = int(new_value)
+	except:
+		pass
+
 	for item in db:
 		if item.id == obj_id:
 			try:
@@ -117,6 +122,7 @@ def search(args):
 	try:
 		field_vals = list(map(operator.attrgetter(field), db))
 		items_vals = list(zip(db, field_vals))
+		print(items_vals)
 		items = [str(x[0]) for x in items_vals if x[1] == value]
 
 		res = '\n'.join(items)
