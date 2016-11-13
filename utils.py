@@ -2,8 +2,14 @@ import os
 import itertools
 import tty, sys, termios
 
+last_id = 0
+if os.path.isfile('last_id'):
+	with open('last_id', 'r') as f:
+		global last_id
+		last_id = int(f.read()) + 1
+
 class StorageSystem:
-	class_counter = itertools.count()
+	class_counter = itertools.count(last_id)
 
 	def __init__(self, args):
 		self.id = int(next(self.class_counter))

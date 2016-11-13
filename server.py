@@ -15,8 +15,6 @@ fieldnames = ('ID', '\tModel', '\tSys. Cache', 'Max control.',
 
 dbfilename = 'db.dat'
 
-db = []
-
 def signal_handler(signal, frame):
 	save_db()
 	print('Bye!')
@@ -37,6 +35,10 @@ def save_db():
 		data = pickle.dumps(db)
 		f.write(data)
 		print('Data saved.')
+
+	if db:
+		with open('last_id', 'w') as tf:
+			tf.write(str(db[-1].id))
 
 #-------------------------------------------------------------
 def check_data(args):
@@ -75,13 +77,21 @@ def edit_record(args):
 
 	for item in db:
 		if item.id == obj_id:
-			setattr(item, field, new_value)
+			try:
+				setattr(item, field, new_value)
+			except:
+				return '<<< Bad data'
 		else:
 			return '<<< No such record'
 
 
 def delete_record(obj_id):
 	if not db: return '<<< DB is empty' 
+
+	try:
+		obj_id = int(obj_id)
+	except:
+		return '<<< Wrong param'
 
 	for item in db:
 		if item.id == obj_id:
@@ -96,12 +106,20 @@ def search(args):
 
 	field, value = args
 
-	field_vals = list(map(operator.attrgetter(field), db))
-	items_vals = list(zip(db, field_vals))
-	items = [str(x[0]) for x in items_vals if x[1] == value]
+	try:
+		value = int(value)
+	except:
+		pass
 
-	res = '\n'.join(items)
-	return res
+	try:
+		field_vals = list(map(operator.attrgetter(field), db))
+		items_vals = list(zip(db, field_vals))
+		items = [str(x[0]) for x in items_vals if x[1] == value]
+
+		res = '\n'.join(items)
+		return res
+	except:
+		return '<<< Bad params'
 
 @header
 def show_all(args):
@@ -113,10 +131,13 @@ def show_all(args):
 @header
 def sort(arg):
 	if not db: return '<<< DB is empty' 
-	sorted_items = list(sorted(db, key=operator.attrgetter(arg)))
-	items = [str(x) for x in sorted_items]
-	res = '\n'.join(items)
-	return res
+	try:
+		sorted_items = list(sorted(db, key=operator.attrgetter(arg)))
+		items = [str(x) for x in sorted_items]
+		res = '\n'.join(items)
+		return res
+	except:
+		return '<<< Wrong key'
 
 #-------------------------------------------------------------
 

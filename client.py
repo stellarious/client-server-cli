@@ -14,11 +14,10 @@ PORT = 1488
 
 conn = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
-fieldnames = ('Model', 'System cache', 'Max controllers', 'Protocols',
-	'Port types', 'Max disks', 'Price')
+fieldnames = (('Model', str), ('System cache', int), ('Max controllers', int), ('Protocols', str),
+	('Port types', str), ('Max disks', int), ('Price', int))
 
 attrnames = 'Hint: id, model, system_cache, max_controllers, protocols, port_types, max_disks, price'
-
 
 def signal_handler(signal, frame):
         print('\nYou pressed Ctrl+C!')
@@ -35,7 +34,14 @@ def head(fn):
 def add_record(num):
 	record_attr = []
 	for field in fieldnames:
-		tmp = input('%s: ' % field)
+		while True:
+			tmp = input('{}: '.format(field[0]))
+			if not tmp:	continue
+			try:
+				field[1](tmp)
+				break
+			except:
+				print('Wrong type.')
 		record_attr.append(tmp)
 	res = (num, record_attr)
 	send(conn, res)
