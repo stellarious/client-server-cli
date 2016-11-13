@@ -71,7 +71,11 @@ def add_record(args):
 def edit_record(args):
 	if not db: return '<<< DB is empty'
 
-	obj_id = args[0]
+	try:
+		obj_id = int(args[0])
+	except:
+		return '<<< Wrong param'
+
 	field = args[1]
 	new_value = args[2]
 
@@ -79,10 +83,10 @@ def edit_record(args):
 		if item.id == obj_id:
 			try:
 				setattr(item, field, new_value)
+				return '<<< OK'
 			except:
 				return '<<< Bad data'
-		else:
-			return '<<< No such record'
+	return '<<< No such record'
 
 
 def delete_record(obj_id):
@@ -97,8 +101,7 @@ def delete_record(obj_id):
 		if item.id == obj_id:
 			db.remove(item)
 			return '<<< Record with id {} was deleted'.format(obj_id)
-		else:
-			return '<<< No such record'
+	return '<<< No such record'
 
 @header
 def search(args):
